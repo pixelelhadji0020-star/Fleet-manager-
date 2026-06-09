@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% block title %}Réservations{% endblock %}
+{% block extra_css %}
+<style>
+.anav{background:var(--card);border-bottom:1px solid var(--bord);padding:0 14px;display:flex;gap:0;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.anav::-webkit-scrollbar{display:none}
+.anav a{font-size:13px;font-weight:500;padding:13px 15px;color:var(--txt-3);border-bottom:2px solid transparent;white-space:nowrap;transition:all .15s;flex-shrink:0}
+.anav a.on{color:var(--gold);border-bottom-color:var(--gold);font-weight:700}
+.fpills{display:flex;gap:7px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:3px;margin-bottom:18px}
+.fpills::-webkit-scrollbar{display:none}
+.fpills a{flex-shrink:0}
+.rcard{background:var(--card);border:1px solid var(--bord);border-radius:var(--r);padding:15px;margin-bottom:10px}
+.rcard-hd{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:10px}
+.ract{display:flex;gap:6px;flex-wrap:wrap;padding-top:10px;border-top:1px solid var(--bord)}
+.ract form{flex:1;min-width:90px}
+.ract button{width:100%}
+.act{display:inline-flex;align-items:center;justify-content:center;padding:8px 14px;border-radius:8px;font-size:12.5px;font-weight:700;cursor:pointer;border:1.5px solid;font-family:'Plus Jakarta Sans',sans-serif;transition:all .15s;width:100%}
+.act-ok{background:var(--green-bg);border-color:var(--green-bord);color:var(--green)}.act-ok:hover{background:var(--green);color:#0e1117}
+.act-no{background:var(--red-bg);border-color:var(--red-bord);color:var(--red)}.act-no:hover{background:var(--red);color:#fff}
+.act-end{background:var(--gold-dim);border-color:var(--gold-bord);color:var(--gold)}.act-end:hover{background:var(--gold);color:#0e1117}
+</style>
+{% endblock %}
+{% block content %}
+<div class="anav">
+  <a href="/admin">📊 Dashboard</a>
+  <a href="/admin/clients">👥 Clients</a>
+  <a href="/admin/reservations" class="on">📅 Réservations</a>
+  <a href="/admin/vehicules">🚗 Véhicules</a>
+  <a href="/admin/statistiques">🧠 Intelligence</a>
+</div>
+<div class="wrap" style="padding-top:24px;padding-bottom:80px">
+  <h1 style="font-size:22px;font-weight:800;letter-spacing:-.04em;margin-bottom:20px">Réservations</h1>
+  <div class="fpills">
+    {% for val,lbl,ico in [('','Toutes','📋'),('en_attente','En attente','⏳'),('confirmee','Confirmées','✓'),('terminee','Terminées','🏁'),('annulee','Annulées','✕')] %}
+    <a href="/admin/reservations{% if val %}?status={{val}}{% endif %}" class="btn {{'btn-gold' if status_filter==val else 'btn-ghost'}} btn-sm">{{ico}} {{lbl}}</a>
+    {% endfor %}
+  </div>
+  {% if reservations %}
+  {% for r in reservations %}
+  <div class="rcard">
+    <div class="rcard-hd">
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:700;font-size:14.5px">{{r.first_name}} {{r.last_name}}</div>
+        <div style="font-size:12px;color:var(--txt-2);margin-top:1px">{{r.email}}</div>
+        <div style="font-size:13.5px;font-weight:600;margin-top:4px">{{r.brand}} {{r.model}}{% if r.plate %} <span style="font-family:'DM Mono',monospace;font-size:11px;font-weight:400;color:var(--txt-3)">· {{r.plate}}</span>{% endif %}</div>
+        <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--txt-3);margin-top:2px">📅 {{r.date_start}} → {{r.date_end}}</div>
+        <div style="font-size:14px;font-weight:800;margin-top:4px;letter-spacing:-.02em">{{r.total_price}} FCFA</div>
+      </div>
+      <span class="tag {% if r.status=='confirmee' %}tag-green{% elif r.status=='en_attente' %}tag-amber{% elif r.status=='terminee' %}tag-blue{% elif r.status in ['annulee','refusee'] %}tag-red{% else %}tag-gray{% endif %}" style="flex-shrink:0;font-size:10.5px">
+        {{'En attente' if r.status=='en_attente' else 'Confirmée' if r.status=='confirmee' else 'Terminée' if r.status=='terminee' else 'Annulée' if r.status=='annulee' else 'Refusée'}}
+      </span>
+    </div>
+    {% if r.status=='en_attente' %}
+    <div class="ract">
+      <form method="post" action="/admin/reservation/{{r.id}}/action"><input type="hidden" name="action" value="confirmer"><button type="submit" class="act act-ok">✓ Confirmer</button></form>
+      <form method="post" action="/admin/reservation/{{r.id}}/action"><input type="hidden" name="action" value="refuser"><button type="submit" class="act act-no">✕ Refuser</button></form>
+    </div>
+    {% elif r.status=='confirmee' %}
+    <div class="ract">
+      <form method="post" action="/admin/reservation/{{r.id}}/action"><input type="hidden" name="action" value="terminer"><button type="submit" class="act act-end">🏁 Clôturer la location</button></form>
+    </div>
+    {% endif %}
+  </div>
+  {% endfor %}
+  {% else %}
+  <div style="text-align:center;padding:48px 16px;background:var(--card);border:1px solid var(--bord);border-radius:var(--r)">
+    <div style="font-size:32px;margin-bottom:12px">📭</div>
+    <div style="font-weight:600;font-size:14.5px;margin-bottom:4px">Aucune réservation</div>
+    <div style="font-size:13px;color:var(--txt-3)">Aucun résultat pour ce filtre.</div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

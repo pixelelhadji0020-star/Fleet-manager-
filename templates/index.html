@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+{% block title %}Accueil{% endblock %}
+{% block extra_css %}
+<style>
+.hero{background:linear-gradient(135deg,#0a0e18 0%,#0e1117 55%,#12180a 100%);padding:80px 20px 72px;text-align:center;position:relative;overflow:hidden;border-bottom:1px solid var(--bord)}
+.hero::before{content:'';position:absolute;left:50%;top:-60px;transform:translateX(-50%);width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(212,160,23,.07) 0%,transparent 70%);pointer-events:none}
+.hero-eyebrow{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:18px;opacity:.9}
+.hero-title{font-size:clamp(32px,7vw,56px);font-weight:800;letter-spacing:-.05em;line-height:1.05;margin-bottom:18px;color:var(--txt)}
+.hero-title em{color:var(--gold);font-style:normal}
+.hero-sub{font-size:16px;color:var(--txt-2);max-width:500px;margin:0 auto 36px;line-height:1.7}
+.hero-ctas{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.hero-cta-p{padding:14px 32px;border-radius:11px;font-weight:800;font-size:15px;background:linear-gradient(135deg,var(--gold) 0%,var(--gold-h) 100%);color:#0e1117;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:all .18s;box-shadow:var(--sh-gold);display:inline-block}
+.hero-cta-p:hover{transform:translateY(-1px);box-shadow:0 0 0 1px rgba(212,160,23,.5),0 6px 24px rgba(212,160,23,.3)}
+.hero-cta-s{padding:14px 28px;border-radius:11px;font-weight:700;font-size:15px;background:transparent;color:var(--txt-2);border:1px solid var(--bord-h);cursor:pointer;transition:all .18s;display:inline-block}
+.hero-cta-s:hover{background:var(--bg-2);color:var(--txt);border-color:var(--gold)}
+
+/* SECTION */
+.sec-lbl{font-family:'DM Mono',monospace;font-size:9.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--txt-3);margin-bottom:12px;display:flex;align-items:center;gap:10px}
+.sec-lbl::after{content:'';flex:1;height:1px;background:var(--bord)}
+
+/* VEHICLE CARDS */
+.vgrid{display:grid;grid-template-columns:1fr;gap:13px}
+.vc{background:var(--card);border:1px solid var(--bord);border-radius:var(--r);overflow:hidden;transition:all .2s;display:flex;flex-direction:row}
+.vc:hover{border-color:var(--bord-h);box-shadow:0 4px 24px rgba(0,0,0,.4),0 0 0 1px rgba(212,160,23,.1)}
+.vc-img{width:108px;min-width:108px;background:var(--bg-2);display:flex;align-items:center;justify-content:center;font-size:38px;border-right:1px solid var(--bord);flex-shrink:0;position:relative;overflow:hidden}
+.vc-img img{width:100%;height:100%;object-fit:cover}
+.vc-body{padding:13px 15px;flex:1;display:flex;flex-direction:column;min-width:0}
+.vc-cat{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--txt-3);margin-bottom:4px}
+.vc-name{font-weight:700;font-size:15px;color:var(--txt);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vc-avail{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--txt-2);margin-bottom:8px}
+.dot-ok{width:7px;height:7px;border-radius:50%;background:var(--green);flex-shrink:0}
+.dot-no{width:7px;height:7px;border-radius:50%;background:var(--txt-3);flex-shrink:0}
+.vc-tags{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px}
+.vc-tag{font-size:10px;padding:2px 7px;border-radius:5px;background:var(--bg-2);color:var(--txt-2);border:1px solid var(--bord)}
+.vc-foot{margin-top:auto;display:flex;align-items:center;justify-content:space-between;padding-top:10px;border-top:1px solid var(--bord)}
+.vc-price{font-size:16px;font-weight:800;letter-spacing:-.03em;color:var(--txt)}
+.vc-price span{font-size:11px;font-weight:400;color:var(--txt-3)}
+
+/* HOW */
+.how-step{display:flex;gap:16px;align-items:flex-start;padding:18px 0;border-bottom:1px solid var(--bord)}
+.how-step:last-child{border-bottom:none}
+.how-num{width:40px;height:40px;min-width:40px;border-radius:11px;background:var(--gold-dim);border:1px solid var(--gold-bord);color:var(--gold);font-family:'DM Mono',monospace;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.how-title{font-weight:700;font-size:15px;margin-bottom:3px;color:var(--txt)}
+.how-desc{font-size:13px;color:var(--txt-2);line-height:1.6}
+
+/* CTA BAND */
+.cta-band{background:linear-gradient(135deg,#1a1300 0%,#251c00 50%,#1a1300 100%);border:1px solid var(--gold-bord);border-radius:var(--r-lg);padding:40px 24px;text-align:center;margin:40px 0;position:relative;overflow:hidden}
+.cta-band::before{content:'';position:absolute;top:-40px;left:50%;transform:translateX(-50%);width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(212,160,23,.08) 0%,transparent 70%)}
+
+@media(min-width:600px){.vgrid{grid-template-columns:1fr 1fr}.vc{flex-direction:column}.vc-img{width:100%;min-width:unset;height:155px;border-right:none;border-bottom:1px solid var(--bord)}}
+@media(min-width:900px){.vgrid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:599px){.hero-title{font-size:32px}.hero-sub{font-size:14px;margin-bottom:28px}.hero-ctas{flex-direction:column;align-items:center}}
+</style>
+{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="hero-eyebrow">Agence de location · Dakar, Sénégal</div>
+  <h1 class="hero-title">Louer un véhicule,<br><em>simplement.</em></h1>
+  <p class="hero-sub">Réservez en quelques minutes. Déposez vos documents une fois. Prenez la route l'esprit libre.</p>
+  <div class="hero-ctas">
+    <a href="/catalogue" class="hero-cta-p">Voir la flotte disponible</a>
+    <a href="/inscription" class="hero-cta-s">Créer mon compte</a>
+  </div>
+</section>
+
+<div class="wrap" style="padding-top:48px;padding-bottom:48px">
+  {% if vehicles %}
+  <div class="sec-lbl" style="margin-bottom:20px">Flotte disponible</div>
+  <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:20px;flex-wrap:wrap;gap:8px">
+    <h2 style="font-size:22px;font-weight:800;letter-spacing:-.04em">Véhicules populaires</h2>
+    <a href="/catalogue" style="font-size:13px;font-weight:600;color:var(--gold)">Voir tout →</a>
+  </div>
+  <div class="vgrid" style="margin-bottom:48px">
+    {% for v in vehicles %}
+    <div class="vc">
+      <div class="vc-img">
+        {% if v.image %}
+          {% if v.image.startswith('data:') or v.image.startswith('http') %}
+            <img src="{{v.image}}" alt="{{v.brand}} {{v.model}}">
+          {% else %}
+            <img src="/uploads/{{v.image}}" alt="{{v.brand}} {{v.model}}">
+          {% endif %}
+        {% else %}
+          {% if v.category=='SUV' %}🚙{% elif v.category=='Luxe' %}🏎️{% elif v.category=='Utilitaire' %}🚐{% else %}🚗{% endif %}
+        {% endif %}
+      </div>
+      <div class="vc-body">
+        <div class="vc-cat">{{v.category}}</div>
+        <div class="vc-name">{{v.brand}} {{v.model}}</div>
+        <div class="vc-avail">
+          <span class="{% if v.status=='disponible' %}dot-ok{% else %}dot-no{% endif %}"></span>
+          {{v.status|title}}
+        </div>
+        <div class="vc-tags">
+          <span class="vc-tag">{{v.fuel}}</span>
+          <span class="vc-tag">{{v.transmission}}</span>
+          <span class="vc-tag">{{v.seats}}p</span>
+          <span class="vc-tag">{{v.year}}</span>
+        </div>
+        <div class="vc-foot">
+          <div class="vc-price">{{v.price_per_day}} FCFA <span>/ jour</span></div>
+          <a href="/vehicule/{{v.id}}" class="btn btn-gold btn-sm">Voir →</a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- HOW IT WORKS -->
+  <div class="sec-lbl" style="margin-bottom:20px">Processus</div>
+  <div style="display:grid;gap:0;margin-bottom:40px">
+    {% for num,title,desc in [
+      ('01','Créez votre compte','Inscription en 2 minutes. Email, prénom, nom — c\'est tout.'),
+      ('02','Déposez vos documents','Permis, CNI, justificatif. Une seule fois, valable pour toutes vos futures réservations.'),
+      ('03','Choisissez votre véhicule','Parcourez la flotte, filtrez par budget et disponibilité, réservez en ligne.'),
+      ('04','Prenez la route','Récupérez votre véhicule à l\'agence. Facture générée automatiquement au retour.'),
+    ] %}
+    <div class="how-step">
+      <div class="how-num">{{num}}</div>
+      <div><div class="how-title">{{title}}</div><div class="how-desc">{{desc}}</div></div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-band">
+    <div style="font-size:22px;font-weight:800;letter-spacing:-.04em;margin-bottom:8px;position:relative">Prêt à prendre la route ?</div>
+    <div style="font-size:14px;color:var(--txt-2);margin-bottom:24px;position:relative">Créez votre compte gratuitement et réservez en quelques minutes.</div>
+    <a href="/inscription" class="hero-cta-p" style="position:relative">Commencer maintenant →</a>
+  </div>
+</div>
+{% endblock %}
